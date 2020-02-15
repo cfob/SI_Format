@@ -42,9 +42,9 @@
         public const Double Pi = 3.14159265359;
         public const Double NaturalLogBase = 2.71828182846;
 
-// SI.Format.SI_Double
+// InfoReg.SI_Format.Format
 
-       String SI_Double(Double dval, String sformat, String unit)
+       String Format(Double dval, String sformat, String unit)
        sformat can be in G or N formats please see:
        https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#the-general-g-format-specifier
        or
@@ -53,57 +53,72 @@
     // Examples as used in the unit test
 
             double val = 123.456e17;
-            ans = SI.Format.SI_Double(val, "G6", "metres");
+            ans = InfoReg.SI_Format.Format(val, "G6", "metres");
             ans contains "12.3456 exa-metres"
             
-            ans = SI.Format.SI_Double(val, "G6", "m");
+            ans = InfoReg.SI_Format.Format(val, "G6", "m");
             ans contains "12.3456 Em". This making use of the short prefix because the unit was expressed in short form.
 
             val = 98.7654E-21;
-            ans = SI.Format.SI_Double(val, "G6", "g");
+            ans = InfoReg.SI_Format.Format(val, "G6", "g");
             ans contains "98.7654 zg"
 
             val = 99.9995E32;
-            ans = SI.Format.SI_Double(val, "G7", "litres");
+            ans = InfoReg.SI_Format.Format(val, "G7", "litres");
             ans contains "9.99995E+33 litres". This value is too high for SI prefixes.
 
             val = 99.9994E-29;
-            ans = SI.Format.SI_Double(val, "G7", "litres");
+            ans = InfoReg.SI_Format.Format(val, "G7", "litres");
             ans contains "9.99994E-28 litres". This value is too small for SI prefixes.
 
             val = 45.7;
-            ans = SI.Format.SI_Double(val, "G7", "m");
+            ans = InfoReg.SI_Format.Format(val, "G7", "m");
             ans contains "45.7 m". No SI prefix provided in the 0 999.999999... range.
 
             // "G4" will only print 3 characters in next test
             val = 0.5;
-            ans = SI.Format.SI_Double(val, "G4", "l");
+            ans = InfoReg.SI_Format.Format(val, "G4", "l");
             ans contains "500 ml".
 
             val = 1500;
-            ans = SI.Format.SI_Double(val, "N2", "m");
+            ans = InfoReg.SI_Format.Format(val, "N2", "m");
             ans contains "1.50 km".
 
             val = 365.25 * 24.0 * 60.0 * 60.0 * SI.Physical_Constants.LightSpeed;
-            ans = SI.Format.SI_Double(val, "G3", "metres");
+            ans = InfoReg.SI_Format.Format(val, "G3", "metres");
             ans contains "9.46 peta-metres". This distance is also known as a light-year.
             
-// String SI_Float(Float fval, String sformat, String unit
+// String InfoReg.SI_Format.Format(Float fval, String sformat, String unit)
        sformat can be in G or N formats please see:
        https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#the-general-g-format-specifier
        or
        https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#the-numeric-n-format-specifier
 
             float fval = (float)123.789E-7;
-            ans = SI.Format.SI_Float(fval, "G4", "F");
+            ans = InfoReg.SI_Format.Format(fval, "G4", "F");
             ans contains "12.38 μF". Save in UTF-8 to preserve the greek character "μ".
 
-// String SI_Decimal(Decimal decimal_val, String sformat, String unit
+// String InfoReg.SI_Format.Format(Decimal decimal_val, String sformat, String unit)
        sformat can be in G or N formats please see:
        https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#the-general-g-format-specifier
        or
        https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#the-numeric-n-format-specifier
 
             Decimal decimal_val = Decimal.Parse("1234.5678901234567890123");
-            ans = SI.Format.SI_Decimal(decimal_val, "G21", "grams");
+            ans = InfoReg.SI_Format.Format(decimal_val, "G21", "grams");
             ans contains "1.23456789012345678901 kilo-grams".
+
+//  void InfoReg.SI_Format.Parse(String, out Double)
+            double dans;
+            InfoReg.SI_Format.Parse("1.23456 km", out dans);
+            => dans now has a value of 1.23456e3
+
+// void InfoReg.SI_Format.Parse(String, out float)
+            float val;
+            InfoReg.SI_Format.Parse("1.23456 km", out val);
+            => the value of val is 1.23456e3;
+
+// void InfoReg.SI_Format.Parse(String, out Decimal)
+            decimal val;
+            InfoReg.SI_Format.Parse("1.234567890123456789012 km", out val);
+            => val has a value of (decimal)1234.567890123456789012;

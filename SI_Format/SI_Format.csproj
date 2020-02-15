@@ -1,9 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>SI_Format</RootNamespace>
+    <TargetFrameworks>netstandard2.0;net45;netcoreapp3.1</TargetFrameworks>
+    <RootNamespace>InfoReg</RootNamespace>
     <AssemblyName>SI_Format</AssemblyName>
+    <Authors>Conor O'Brien</Authors>
+    <Company>Information Register</Company>
+    <Description>SI_Format allows strings like 21.34km be parsed to return a numerical value of 21,340 as a float, double or decimal. SI_Format will also adjust the value of float, double or decimal such that 34,560 may be written as 34.56kB where "B" was passed as the unit to use.
+</Description>
+    <Copyright>2019-2020 Information Register</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,5 +23,23 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>C:\Users\Conor\source\repos\SI_Format\SI_Format\SI_Format.xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="license.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="readme.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
