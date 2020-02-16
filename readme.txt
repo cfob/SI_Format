@@ -1,5 +1,4 @@
-// InfoReg.SI_Format Description
-// InfoReg.SI_Format.Physical_Constants
+// InfoReg.Physical_Constants Description
 //
 // Date 20191204
         // Values obtained at https://physics.nist.gov/cuu/Constants/
@@ -42,6 +41,7 @@
         public const Double Pi = 3.14159265359;
         public const Double NaturalLogBase = 2.71828182846;
 
+// InfoReg.SI_Format Description
 // InfoReg.SI_Format.Format
 
        String Format(Double dval, String sformat, String unit)
