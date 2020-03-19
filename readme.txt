@@ -111,14 +111,14 @@
 //  void InfoReg.SI_Format.Parse(String, out Double)
             double dans;
             InfoReg.SI_Format.Parse("1.23456 km", out dans);
-            => dans now has a value of 1.23456e3
+            => dans now has a value of 1,234.56
 
 // void InfoReg.SI_Format.Parse(String, out float)
             float val;
             InfoReg.SI_Format.Parse("1.23456 km", out val);
-            => the value of val is 1.23456e3;
+            => the value of val is 1,234.56
 
 // void InfoReg.SI_Format.Parse(String, out Decimal)
             decimal val;
             InfoReg.SI_Format.Parse("1.234567890123456789012 km", out val);
-            => val has a value of (decimal)1234.567890123456789012;
+            => val has a value of (decimal)1234.567890123456789012
