@@ -137,19 +137,46 @@
         </member>
         <member name="T:InfoReg.SI_Format">
             <summary>
-            Format is a class that contains functions to adjust or parse numbers to and from
-            strings like 10pF or 123.46 kilo-metres oe 65.123 ml.
+            SI_Format is a class that contains functions to adjust or parse numbers to and from
+            strings like 10pF or 123.46 kilo-metres or 65.123 ml.
             </summary>
         </member>
-        <member name="M:InfoReg.SI_Format.Format(System.Double,System.String,System.String)">
+        <member name="T:InfoReg.SI_Format.Padding">
+            <summary>
+            Padding is an enumberated type.
+            An enumerated value to indicate if a dash "-" is required between the SI prefix and the unit as in kilo-gram. 
+            Padding will also indcate if a traling space should be appended as padding.
+            </summary>
+        </member>
+        <member name="F:InfoReg.SI_Format.Padding.dashonly">
+            <summary>
+            dashonly: Default behaviour for Format function.
+            </summary>
+        </member>
+        <member name="F:InfoReg.SI_Format.Padding.dashWithPadding">
+            <summary>
+            dashWithPadding: Use a dash but no trailing space
+            </summary>
+        </member>
+        <member name="F:InfoReg.SI_Format.Padding.paddingOnly">
+            <summary>
+            paddingOnly: Add a trailing space only
+            </summary>
+        </member>
+        <member name="F:InfoReg.SI_Format.Padding.noPaddingOrDash">
+            <summary>
+            noPaddingOrDash: No dash and no trailing space required
+            </summary>
+        </member>
+        <member name="M:InfoReg.SI_Format.Format(System.Double,System.String,System.String,InfoReg.SI_Format.Padding)">
             <summary>
             Returns values in text in SI format. An example is 123.45km.
             It takes a double value and looks at its decimal exponent. The exponent 
             is reduced to its residue three value. It then prefixes the unit
             passed in with the appropriate SI prefix.
             
-            "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo",
-            "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-"
+            "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+            "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto"
             
             If siunit is two or less characters the return will use short SI
             prefixes like:
@@ -162,30 +189,32 @@
                   SI does not support numbers above 10^27 or below 10^-24 
                   and any such value will be returned unmodified without SI prefix units.
                   
-            Example: ...
+            </summary>
+            <param name="d_val">A double value to be SI normalized.</param>
+            <param name="sformat">Is the format string usually based on G or N </param>
+            <param name="siunit">An SI unit like watt, metre or l</param>
+            <param name="padding">Padding.dashOnly | Padding.dashWithPadding | Padding.paddingOnly | Padding.noPaddingOrDash</param>
+            <returns>Formatted string e.g. "9.46 peta-metres"</returns>
+            <example>
                      using InfoReg;
                      ...
                      String ans;
                      double val = 123.456e17;
                      ans = InfoReg.SI_Format.Format(val, "G6", "metres");
                      => ans contains: "12.3456 exa-metres"
-            </summary>
-            <param name="d_val">A double value to be SI normalized.</param>
-            <param name="sformat">Is the format string usually based on G or N </param>
-            <param name="siunit">An SI unit like watt, metre or l</param>
-            <returns>Formatted string e.g. "9.46 peta-metres"</returns>
+                     ans = InfoReg.SI_Format.Format(val, "G6", "metres", noPaddingOrDash);
+                     => ans contains: "12.3456 exametres"
+            </example>
         </member>
-        <member name="M:InfoReg.SI_Format.Format(System.Single,System.String,System.String)">
+        <member name="M:InfoReg.SI_Format.Format(System.Single,System.String,System.String,InfoReg.SI_Format.Padding)">
             <summary>
-            This converts the float to a double and uses the 
-            Format(Double d_val, String sformat, String siunit) function.
             Returns values in a text SI format. An example is 123.45km.
             It takes a float value and looks at its decimal exponent. The exponent 
             is reduced to its residue three value. It then prefixes the unit
             passed in with the appropriate SI prefix.
             
-            "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo",
-            "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-"
+            "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+            "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto"
             
             If siunit is two or less characters the return will use short SI
             prefixes like:
@@ -204,21 +233,24 @@
                      float fval = (float)123.789E-7;
                      ans = InfoReg.SI_Format.Format(fval, "G4", "F");
                      => ans contains: "12.38 μF"
+                     ans = InfoReg.SI_Format.Format(fval, "G4", "Farads", InfoReg.SI_Format.Padding.dashWithPadding);
+                     => ans contains: "12.38 micro-Farads " // Both a dash and trailing space are used
             </summary>
             <param name="f_val">A float value to be SI normalized.</param>
             <param name="sformat">Is the format string usually based on G or N </param>
             <param name="siunit">An SI unit like watt, metre or l</param>
+            <param name="padding">Padding.dashOnly | Padding.dashWithPadding | Padding.paddingOnly | Padding.noPaddingOrDash</param>
             <returns>Formatted string e.g. "9.46 peta-metres"</returns>
         </member>
-        <member name="M:InfoReg.SI_Format.Format(System.Decimal,System.String,System.String)">
+        <member name="M:InfoReg.SI_Format.Format(System.Decimal,System.String,System.String,InfoReg.SI_Format.Padding)">
             <summary>
             Returns values in text in SI format. An example is 123.45km.
             It takes a decimal value and looks at its decimal exponent. The exponent 
             is reduced to its residue three value. It then prefixes the unit
             passed in with the appropriate SI prefix.
             
-            "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo",
-            "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-"
+            "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+            "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto"
             
             If siunit is two or less characters the return will use short SI
             prefixes like:
@@ -237,10 +269,13 @@
                      Decimal decimal_val = Decimal.Parse("1234.5678901234567890123");
                      ans = InfoReg.SI_Format.Format(decimal_val, "G21", "grams");
                      => ans contains: "1.23456789012345678901 kilo-grams"
+                     ans = InfoReg.SI_Format.Format(decimal_val, "G21", "grams", InfoReg.SI_Format.Padding.paddingOnly);
+                     => ans contains: "1.23456789012345678901 kilograms " // trailing space added
             </summary>
             <param name="decimal_val">A decimal value to be SI normalized.</param>
             <param name="sformat">Is the format string usually based on G or N </param>
             <param name="siunit">An SI unit like watt, metre or l</param>
+            <param name="padding">Padding.dashOnly | Padding.dashWithPadding | Padding.paddingOnly | Padding.noPaddingOrDash</param>
             <returns>Formatted string e.g. "9.46 pm"</returns>
         </member>
         <member name="M:InfoReg.SI_Format.Parse(System.String,System.Double@)">

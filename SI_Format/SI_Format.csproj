@@ -1,27 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netcoreapp3.1</TargetFrameworks>
+  <!--  <TargetFramework>netcoreapp3.1</TargetFramework> -->
     <RootNamespace>InfoReg</RootNamespace>
     <AssemblyName>SI_Format</AssemblyName>
     <Authors>Conor O'Brien</Authors>
     <Company>Information Register</Company>
-    <Description>SI_Format allows strings like 21.34km be parsed to return a numerical value of 21,340 as a float, double or decimal. SI_Format will also adjust the value of float, double or decimal such that 34,560 may be written as 34.56kB where "B" was passed as the unit to use.
-</Description>
+    <Description>SI_Format allows strings like 21.34km be parsed to return a numerical value of 21,340 as a float, double or decimal. 
+      SI_Format will also adjust the value of float, double or decimal such that 34,560 may be written as 34.56kB 
+      where "B" was passed as the unit to use.
+    </Description>
     <Copyright>2019-2020 Information Register</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Deterministic>true</Deterministic>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\Conor\source\repos\SI_Format\SI_Format\SI_Format.xml</DocumentationFile>
+    <RepositoryUrl>https://github.com/cfob/SI_Format</RepositoryUrl>
+    <RepositoryType>github</RepositoryType>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>C:\Users\Conor\source\repos\SI_Format\SI_Format\SI_Format.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <ShouldCreateLogs>True</ShouldCreateLogs>
+    <AdvancedSettingsExpanded>True</AdvancedSettingsExpanded>
+    <UpdateAssemblyVersion>true</UpdateAssemblyVersion>
+    <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
+    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
+    <UpdatePackageVersion>true</UpdatePackageVersion>
+    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
+    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+    <PrimaryVersionType>AssemblyFileVersionAttribute</PrimaryVersionType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,5 +56,15 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
+
+<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp5.0'">
+    <PackageReference Include="NuGet.Versioning">
+      <Version>5.4.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+<ItemGroup>
+  <PackageReference Include="NuGet.Versioning" Version="5.4.0" />
+</ItemGroup>
 
 </Project>

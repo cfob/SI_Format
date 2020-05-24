@@ -1,15 +1,40 @@
 ﻿// Maintain this file in UTF-8 coding
 using System;
+using System.Reflection;
 
 namespace InfoReg
 {
 
     /// <summary>
-    /// Format is a class that contains functions to adjust or parse numbers to and from
-    /// strings like 10pF or 123.46 kilo-metres oe 65.123 ml.
+    /// SI_Format is a class that contains functions to adjust or parse numbers to and from
+    /// strings like 10pF or 123.46 kilo-metres or 65.123 ml.
     /// </summary>
     public static class SI_Format
     {
+        /// <summary>
+        /// Padding is an enumberated type.
+        /// An enumerated value to indicate if a dash "-" is required between the SI prefix and the unit as in kilo-gram. 
+        /// Padding will also indcate if a traling space should be appended as padding.
+        /// </summary>
+        public enum Padding
+        {
+            /// <summary>
+            /// dashonly: Default behaviour for Format function.
+            /// </summary>
+            dashonly,
+            /// <summary>
+            /// dashWithPadding: Use a dash but no trailing space
+            /// </summary>
+            dashWithPadding,
+            /// <summary>
+            /// paddingOnly: Add a trailing space only
+            /// </summary>
+            paddingOnly,
+            /// <summary>
+            /// noPaddingOrDash: No dash and no trailing space required
+            /// </summary>
+            noPaddingOrDash
+        };
 
         /// <summary>
         /// Returns values in text in SI format. An example is 123.45km.
@@ -17,8 +42,8 @@ namespace InfoReg
         /// is reduced to its residue three value. It then prefixes the unit
         /// passed in with the appropriate SI prefix.
         /// 
-        /// "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo",
-        /// "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-"
+        /// "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+        /// "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto"
         /// 
         /// If siunit is two or less characters the return will use short SI
         /// prefixes like:
@@ -31,19 +56,23 @@ namespace InfoReg
         ///       SI does not support numbers above 10^27 or below 10^-24 
         ///       and any such value will be returned unmodified without SI prefix units.
         ///       
-        /// Example: ...
+        /// </summary>
+        /// <param name="d_val">A double value to be SI normalized.</param>
+        /// <param name="sformat">Is the format string usually based on G or N </param>
+        /// <param name="siunit">An SI unit like watt, metre or l</param>
+        /// <param name="padding">Padding.dashOnly | Padding.dashWithPadding | Padding.paddingOnly | Padding.noPaddingOrDash</param>
+        /// <returns>Formatted string e.g. "9.46 peta-metres"</returns>
+        /// <example>
         ///          using InfoReg;
         ///          ...
         ///          String ans;
         ///          double val = 123.456e17;
         ///          ans = InfoReg.SI_Format.Format(val, "G6", "metres");
         ///          => ans contains: "12.3456 exa-metres"
-        /// </summary>
-        /// <param name="d_val">A double value to be SI normalized.</param>
-        /// <param name="sformat">Is the format string usually based on G or N </param>
-        /// <param name="siunit">An SI unit like watt, metre or l</param>
-        /// <returns>Formatted string e.g. "9.46 peta-metres"</returns>
-        public static String Format(double d_val, string sformat, string siunit)
+        ///          ans = InfoReg.SI_Format.Format(val, "G6", "metres", noPaddingOrDash);
+        ///          => ans contains: "12.3456 exametres"
+        /// </example>
+        public static String Format(double d_val, string sformat, string siunit, Padding padding = Padding.dashonly)
         {
             // Note: hecto, deca, deci, and centi are not supported
             // si does not support numbers above 10^27 or below 10^-24 
@@ -63,31 +92,61 @@ namespace InfoReg
                     exp1 -= 3;
                 }
                 double dval = d_val / Math.Pow(10.0, exp1);
+                int prefix_choice = -(exp1 / 3) + adjust;
                 if (siunit.Length >= 3)
                 {
-                    string[] si_prefixes = { "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo",
-                        "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-" };
-                    return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[-(exp1 / 3) + adjust] + siunit;
+                    string[] si_prefixes = { "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+                        "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto" };
+                    switch (padding)
+                    {
+                        case Padding.dashonly:
+                            if (prefix_choice != 8)
+                            {
+                                return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[prefix_choice] + "-" + siunit;
+                            }
+                            else
+                            {
+                                return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[prefix_choice] + siunit;
+                            }
+                        case Padding.dashWithPadding:
+                            if (prefix_choice != 8)
+                            {
+                                return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[prefix_choice] + "-" + siunit + " ";
+                            }
+                            else
+                            {
+                                return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[prefix_choice] + siunit + " ";
+                            }
+                        case Padding.paddingOnly:
+                            return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[prefix_choice] + siunit + " ";
+                    }
+                    return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[prefix_choice] + siunit; // Padding.noPaddingOrDash
                 }
                 else
                 {
                     string[] si_prefixes = { "Y", "Z", "E", "P", "T", "G", "M", "k",
                         "", "m", "μ", "n", "p", "f", "a", "z", "y" };
-                    return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[-(exp1 / 3) + adjust] + siunit;
+                    // A dash is not supported for short SI unit prefixes. Thus, supply with padding (a trailing space) or without
+                    if (padding == Padding.dashWithPadding || padding == Padding.paddingOnly)
+                    {
+                        return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[-(exp1 / 3) + adjust] + siunit + " ";
+                    }
+                    else
+                    {
+                        return string.Format("{0:" + sformat + "} ", dval) + si_prefixes[-(exp1 / 3) + adjust] + siunit;
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// This converts the float to a double and uses the 
-        /// Format(Double d_val, String sformat, String siunit) function.
         /// Returns values in a text SI format. An example is 123.45km.
         /// It takes a float value and looks at its decimal exponent. The exponent 
         /// is reduced to its residue three value. It then prefixes the unit
         /// passed in with the appropriate SI prefix.
         /// 
-        /// "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo",
-        /// "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-"
+        /// "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+        /// "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto"
         /// 
         /// If siunit is two or less characters the return will use short SI
         /// prefixes like:
@@ -106,16 +165,80 @@ namespace InfoReg
         ///          float fval = (float)123.789E-7;
         ///          ans = InfoReg.SI_Format.Format(fval, "G4", "F");
         ///          => ans contains: "12.38 μF"
+        ///          ans = InfoReg.SI_Format.Format(fval, "G4", "Farads", InfoReg.SI_Format.Padding.dashWithPadding);
+        ///          => ans contains: "12.38 micro-Farads " // Both a dash and trailing space are used
         /// </summary>
         /// <param name="f_val">A float value to be SI normalized.</param>
         /// <param name="sformat">Is the format string usually based on G or N </param>
         /// <param name="siunit">An SI unit like watt, metre or l</param>
+        /// <param name="padding">Padding.dashOnly | Padding.dashWithPadding | Padding.paddingOnly | Padding.noPaddingOrDash</param>
         /// <returns>Formatted string e.g. "9.46 peta-metres"</returns>
 
-        public static string Format(float f_val, string sformat, string siunit)
+        public static string Format(float f_val, string sformat, string siunit, Padding padding = Padding.dashonly)
         {
-            double val = f_val;
-            return Format(val, sformat, siunit);
+            // Note: hecto, deca, deci, and centi are not supported
+            // si does not support numbers above 10^27 or below 10^-24 
+            // return unmodified without SI prefix units
+            float exp;
+            exp = System.MathF.Log10(f_val);
+            if (exp >= 27.0 || exp <= -24.0)
+            {
+                return string.Format("{0:" + sformat + "} {1}", f_val, siunit);
+            }
+            else
+            {
+                int exp1 = (int)exp / 3 * 3;
+                int adjust = 8; // Array element for no SI prefix
+                if (exp < 0)
+                {
+                    exp1 -= 3;
+                }
+                float ffval = f_val / MathF.Pow(10.0f, exp1);
+                int prefix_choice = -(exp1 / 3) + adjust;
+                if (siunit.Length >= 3)
+                {
+                    string[] si_prefixes = { "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+                        "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto" };
+                    switch (padding)
+                    {
+                        case Padding.dashonly:
+                            if (prefix_choice != 8)
+                            {
+                                return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[prefix_choice] + "-" + siunit;
+                            }
+                            else
+                            {
+                                return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[prefix_choice] + siunit;
+                            }
+                        case Padding.dashWithPadding:
+                            if (prefix_choice != 8)
+                            {
+                                return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[prefix_choice] + "-" + siunit + " ";
+                            }
+                            else
+                            {
+                                return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[prefix_choice] + siunit + " ";
+                            }
+                        case Padding.paddingOnly:
+                            return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[prefix_choice] + siunit + " ";
+                    }
+                    return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[prefix_choice] + siunit; // Padding.noPaddingOrDash
+                }
+                else
+                {
+                    string[] si_prefixes = { "Y", "Z", "E", "P", "T", "G", "M", "k",
+                        "", "m", "μ", "n", "p", "f", "a", "z", "y" };
+                    // A dash is not supported for short SI unit prefixes. Thus, supply with padding (a trailing space) or without
+                    if (padding == Padding.dashWithPadding || padding == Padding.paddingOnly)
+                    {
+                        return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[-(exp1 / 3) + adjust] + siunit + " ";
+                    }
+                    else
+                    {
+                        return string.Format("{0:" + sformat + "} ", ffval) + si_prefixes[-(exp1 / 3) + adjust] + siunit;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -124,8 +247,8 @@ namespace InfoReg
         /// is reduced to its residue three value. It then prefixes the unit
         /// passed in with the appropriate SI prefix.
         /// 
-        /// "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo",
-        /// "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-"
+        /// "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+        /// "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto"
         /// 
         /// If siunit is two or less characters the return will use short SI
         /// prefixes like:
@@ -144,14 +267,17 @@ namespace InfoReg
         ///          Decimal decimal_val = Decimal.Parse("1234.5678901234567890123");
         ///          ans = InfoReg.SI_Format.Format(decimal_val, "G21", "grams");
         ///          => ans contains: "1.23456789012345678901 kilo-grams"
+        ///          ans = InfoReg.SI_Format.Format(decimal_val, "G21", "grams", InfoReg.SI_Format.Padding.paddingOnly);
+        ///          => ans contains: "1.23456789012345678901 kilograms " // trailing space added
         /// </summary>
         /// <param name="decimal_val">A decimal value to be SI normalized.</param>
         /// <param name="sformat">Is the format string usually based on G or N </param>
         /// <param name="siunit">An SI unit like watt, metre or l</param>
+        /// <param name="padding">Padding.dashOnly | Padding.dashWithPadding | Padding.paddingOnly | Padding.noPaddingOrDash</param>
         /// <returns>Formatted string e.g. "9.46 pm"</returns>
 
 
-        public static string Format(decimal decimal_val, string sformat, string siunit)
+        public static string Format(decimal decimal_val, string sformat, string siunit, Padding padding = Padding.dashonly)
         {
             double exp = Math.Log10((double)decimal_val);
             if (exp >= 27.0 || exp <= -24.0)
@@ -169,9 +295,34 @@ namespace InfoReg
                 decimal decimal_val1 = decimal_val / (decimal)Math.Pow(10.0, exp1);
                 if (siunit.Length >= 3)
                 {
-                    string[] si_prefixes = { "yotta-", "zetta-", "exa-", "peta-", "tera-", "giga-", "mega-", "kilo-",
-                        "", "milli-", "micro-", "nano-", "pico-", "femto-", "atto-", "zepto-", "yocto-" };
-                    return string.Format("{0:" + sformat + "} ", decimal_val1) + si_prefixes[-(exp1 / 3) + adjust] + siunit;
+                    string[] si_prefixes = { "yotta", "zetta", "exa", "peta", "tera", "giga", "mega", "kilo",
+                        "", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto" };
+                    int prefix_choice = -(exp1 / 3) + adjust;
+                    switch (padding)
+                    {
+                        case Padding.dashonly:
+                            if (prefix_choice != 8)
+                            {
+                                return string.Format("{0:" + sformat + "} ", decimal_val1) + si_prefixes[prefix_choice] + "-" + siunit;
+                            }
+                            else
+                            {
+                                return string.Format("{0:" + sformat + "} ", decimal_val1) + si_prefixes[prefix_choice] + siunit;
+                            }
+                        case Padding.dashWithPadding:
+                            if (prefix_choice != 8)
+                            {
+                                return string.Format("{0:" + sformat + "} ", decimal_val1) + si_prefixes[prefix_choice] + "-" + siunit + " ";
+                            }
+                            else
+                            {
+                                return string.Format("{0:" + sformat + "} ", decimal_val1) + si_prefixes[prefix_choice] + siunit + " ";
+
+                            }
+                        case Padding.paddingOnly:
+                            return string.Format("{0:" + sformat + "} ", decimal_val1) + si_prefixes[prefix_choice] + siunit + " ";
+                    }
+                    return string.Format("{0:" + sformat + "} ", decimal_val1) + si_prefixes[-(exp1 / 3) + adjust] + siunit; // Padding.noPaddingOrDash
                 }
                 else
                 {

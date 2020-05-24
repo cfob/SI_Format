@@ -1,17 +1,25 @@
 <?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
-    <version>$version$</version>
+<!--    <version>$version$</version> -->
     <title>$title$</title>
     <authors>Conor O'Brien</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://creativecommons.org/licenses/by/4.0/</licenseUrl>
+    <licenseUrl>https://opensource.org/licenses/BSD-3-Clause</licenseUrl>
     <projectUrl>https://github.com/cfob/SI_Format</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
-    <copyright>Copyright 2019 Information Register</copyright>
+    <releaseNotes>
+      Summary of changes made in this release of the package.
+      Fixes issue where a dash "-" was not included with the kilo prefix.
+      A new optional parameter is an InfoReg.SI_Format.Padding enum.
+      dashonly: Default behaviour for Format function. (same behaviour as 1.0)
+      dashWithPadding: Use a dash but no trailing space
+      paddingOnly: Add a trailing space only
+      noPaddingOrDash: No dash and no trailing space required
+    </releaseNotes>
+    <copyright>Copyright 2019-2020 Information Register</copyright>
     <tags>Tag1 Tag2</tags>
   </metadata>
 </package>
